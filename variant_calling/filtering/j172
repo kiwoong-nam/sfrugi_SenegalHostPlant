@@ -1,0 +1,19 @@
+#!/bin/bash
+#SBATCH --partition=dgimi-eha
+#SBATCH --mem=40G
+module load cv-standard
+module load jre
+
+cd  /lustre/namk/processing_fq/Senegal/vcf/SNP ### Fixed this
+
+## Annotating bad SNPs
+/nfs/work/faw_adaptation/programs/gatk-4.1.2.0/gatk VariantFiltration -R /lustre/namk/processing_fq/splittedref/172.fa -V 172.SNP.vcf.gz --filter-expression "QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0" --filter-name "my_snp_filter" -O 172.SNP.annotated.vcf.gz # Check each SNP is good or not.vcf.gz
+
+## Collecting only good (PASS) SNPs
+zcat 172.SNP.annotated.vcf.gz | grep -P '#|PASS' | /nfs/work/faw_adaptation/programs/vcftools_0.1.13/bin/vcftools --vcf - --max-missing 0.8 --out 172.SNP.filtered --recode #Perform filtering
+
+#compress the new vcf file
+/nfs/work/faw_adaptation/programs/htslib-1.9/bgzip 172.SNP.filtered.recode.vcf
+#index the vcf file
+/nfs/work/faw_adaptation/programs/htslib-1.9/tabix -p vcf 172.SNP.filtered.SNP.filtered.recode.vcf.gz
+

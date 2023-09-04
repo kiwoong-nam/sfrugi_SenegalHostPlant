@@ -1,0 +1,9 @@
+#!/bin/bash
+#SBATCH --partition=dgimi-eha
+#SBATCH --mem=30G
+module load cv-standard
+module load jre
+
+cd  /lustre/namk/processing_fq/Senegal/vcf
+
+/nfs/work/faw_adaptation/programs/gatk-4.1.2.0/gatk GenotypeGVCFs -R /lustre/namk/processing_fq/splittedref/49.fa --variant /lustre/namk/processing_fq/Senegal/vcf/Mergedsamples_06_2022.g.vcf.gz -O /lustre/namk/processing_fq/Senegal/vcf/merged/49.vcf.gz -all-sites
